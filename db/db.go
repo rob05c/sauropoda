@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -33,4 +35,19 @@ func LoadSpecies(db *sql.DB) (map[string]Species, error) {
 		species[s.Name] = s
 	}
 	return species, nil
+}
+
+type DBConfig struct {
+	TokenKey string
+}
+
+func LoadConfig(db *sql.DB) (*DBConfig, error) {
+	cfg := &DBConfig{}
+	if err := db.QueryRow("select token_key from config").Scan(&cfg.TokenKey); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("database missing config row")
+		}
+		return nil, fmt.Errorf("querying: %v", err)
+	}
+	return cfg, nil
 }
