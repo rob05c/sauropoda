@@ -192,3 +192,5 @@ function init() {
 	setLocation();
 	window.setInterval(getDinosaursHere, dinosaurGetIntervalMs);
 }
+
+init();
