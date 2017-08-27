@@ -34,6 +34,8 @@ const imageDir = "images"
 const imageExt = "png"
 const imageUiPath = "images"
 const indexPath = "index.html"
+const indexJSPath = "index.js"
+const indexCSSPath = "index.css"
 
 // RegisterHandlers registers the HTTP endpoints for the web UI, with the given mux.
 // The pathPrefix is a path to prefix all served paths with. For example, to serve the UI at `/ui/` pass the pathPrefix `ui`.
@@ -54,10 +56,23 @@ func RegisterHandlers(mux *http.ServeMux, pathPrefix string, species map[string]
 	if err != nil {
 		return fmt.Errorf("%s failed to load: %v", indexPath, err)
 	}
+
+	indexJSHandler, err := resourceHandler(indexJSPath, "application/javascript")
+	if err != nil {
+		return fmt.Errorf("%s failed to load: %v", indexJSPath, err)
+	}
+
+	indexCSSHandler, err := resourceHandler(indexCSSPath, "text/css")
+	if err != nil {
+		return fmt.Errorf("%s failed to load: %v", indexCSSPath, err)
+	}
+
 	if pathPrefix == "" {
 		pathPrefix = "/"
 	}
 	mux.HandleFunc(pathPrefix, indexHandler)
+	mux.HandleFunc(pathPrefix+indexJSPath, indexJSHandler)
+	mux.HandleFunc(pathPrefix+indexCSSPath, indexCSSHandler)
 
 	return nil
 }
