@@ -1,10 +1,9 @@
 // \todo aggregate vars into single 'world' var?
 var mapDinos = {};
 var map;
-var ajaxRequest;
-var plotlist;
-var plotlayers=[];
 var serverTimeDiff = 0;
+var popupInterval;
+var dinosaurGetIntervalMs = 3000;
 
 function ajax(path, f) {
 	var xhttp = new XMLHttpRequest();
@@ -116,7 +115,6 @@ function getDinosaursHere() {
 	})
 }
 
-var popupInterval;
 function initmap() {
 	map = new L.Map('mapid');
 
@@ -182,9 +180,6 @@ function getServerTimeDiff() {
 		serverTimeDiff = Date.now() - serverTime -  (latency / 2);
 	})
 }
-
-
-var dinosaurGetIntervalMs = 3000;
 
 function init() {
   getServerTimeDiff();
