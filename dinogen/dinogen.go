@@ -1,7 +1,6 @@
 package dinogen
 
 import (
-	"github.com/rob05c/sauropoda/db"
 	"github.com/rob05c/sauropoda/dinosaur"
 	"github.com/rob05c/sauropoda/quadtree"
 	"math"
@@ -29,7 +28,7 @@ func MetresToLongitude(metres float64, latitude float64) float64 {
 }
 
 // returns a slice of the existing dinosaurs, and a slice of new generated dinosaurs
-func GenerateInRadius(qt quadtree.Quadtree, species map[string]db.Species, lat float64, lon float64) (existing []quadtree.PositionedDinosaur, generated []quadtree.PositionedDinosaur) {
+func GenerateInRadius(qt quadtree.Quadtree, species map[string]dinosaur.Species, lat float64, lon float64) (existing []dinosaur.PositionedDinosaur, generated []dinosaur.PositionedDinosaur) {
 	latRadius := MetresToLatitude(radiusMetres) // TODO precompute?
 	lonRadius := MetresToLongitude(radiusMetres, lat)
 	top := lat + latRadius
@@ -39,7 +38,7 @@ func GenerateInRadius(qt quadtree.Quadtree, species map[string]db.Species, lat f
 
 	existingDinosaurs := qt.Get(top, left, bottom, right)
 
-	var generatedDinosaurs []quadtree.PositionedDinosaur
+	var generatedDinosaurs []dinosaur.PositionedDinosaur
 	generateCount := dinosaursPerRadius - len(existingDinosaurs)
 	for i := 0; i < generateCount; i++ {
 		generatedDinosaurs = append(generatedDinosaurs, specieToPositioned(dinosaur.Generate(species), top, left, bottom, right))
@@ -54,8 +53,8 @@ var id uint64
 // specieToIndividual takes the species to create an individual of,
 // and the range to randomly create it in.
 // TODO move to within dinosaur.Generate()?
-func specieToPositioned(specie db.Species, top, left, bottom, right float64) quadtree.PositionedDinosaur {
-	return quadtree.PositionedDinosaur{
+func specieToPositioned(specie dinosaur.Species, top, left, bottom, right float64) dinosaur.PositionedDinosaur {
+	return dinosaur.PositionedDinosaur{
 		Dinosaur: dinosaur.Dinosaur{
 			Name:   specie.Name,
 			Power:  int64(rand.Intn(100)), // TODO implement
@@ -70,17 +69,20 @@ func specieToPositioned(specie db.Species, top, left, bottom, right float64) qua
 
 // TODO rename (removed 'owned' - also used by positioned
 // TODO change to get max from database on startup
+// TODO change to GUID
 var nextOwnedDinosaurID uint64
 
 func nextDinosaurID() int64 {
 	return int64(atomic.AddUint64(&nextOwnedDinosaurID, 1))
 }
 
-func positionedToOwned(p quadtree.PositionedDinosaur) dinosaur.OwnedDinosaur {
-	return dinosaur.OwnedDinosaur{Dinosaur: p.Dinosaur, ID: nextDinosaurID()}
+func PositionedToOwned(p dinosaur.PositionedDinosaur) dinosaur.OwnedDinosaur {
+	return dinosaur.OwnedDinosaur{PositionedDinosaur: p, ID: nextDinosaurID()}
 }
 
-func Query(qt quadtree.Quadtree, species map[string]db.Species, lat float64, lon float64) []quadtree.PositionedDinosaur {
+func Query(qt quadtree.Quadtree, species map[string]dinosaur.Species, lat float64, lon float64) []dinosaur.PositionedDinosaur {
+	// TODO change to return a map, to avoid iterating?
+
 	existing, generated := GenerateInRadius(qt, species, lat, lon)
 	for _, d := range generated {
 		qt.Insert(d)

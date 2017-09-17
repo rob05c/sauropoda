@@ -9,7 +9,19 @@ import (
 const elementSize = 100
 
 type Quadtree struct {
-	root *Node
+	root  *Node
+	dinos map[int64]*dinosaur.PositionedDinosaur
+}
+
+func (q *Quadtree) GetByID(id int64) (*dinosaur.PositionedDinosaur, bool) {
+	dino, ok := q.dinos[id]
+	if !ok {
+		return nil, false
+	}
+	if time.Now().After(dino.Expiration) {
+		return nil, false
+	}
+	return dino, true
 }
 
 type Node struct {
@@ -21,20 +33,11 @@ type Node struct {
 	topRight    *Node
 	bottomLeft  *Node
 	bottomRight *Node
-	elements    []PositionedDinosaur
+	elements    []dinosaur.PositionedDinosaur
 }
 
 func (n *Node) hasSplit() bool {
 	return n.topLeft != nil // it has split, if any child nodes are non-nil
-}
-
-// TODO add json lowercase tags
-type PositionedDinosaur struct {
-	Dinosaur   dinosaur.Dinosaur
-	Latitude   float64
-	Longitude  float64
-	Expiration time.Time
-	ID         int64
 }
 
 func init() {
@@ -48,15 +51,25 @@ func Create() Quadtree {
 }
 
 func createGeneric(l, r, t, b float64) Quadtree {
-	return Quadtree{root: &Node{left: l, right: r, top: t, bottom: b, elements: make([]PositionedDinosaur, 0, elementSize)}}
+	return Quadtree{
+		root: &Node{
+			left:     l,
+			right:    r,
+			top:      t,
+			bottom:   b,
+			elements: make([]dinosaur.PositionedDinosaur, 0, elementSize),
+		},
+		dinos: map[int64]*dinosaur.PositionedDinosaur{},
+	}
 }
 
 // Insert inserts the given dinosaur into the quadtree
-func (q Quadtree) Insert(d PositionedDinosaur) {
+func (q *Quadtree) Insert(d dinosaur.PositionedDinosaur) {
 	q.root.insert(d)
+	q.dinos[d.ID] = &d
 }
 
-func (n *Node) insert(d PositionedDinosaur) {
+func (n *Node) insert(d dinosaur.PositionedDinosaur) {
 	if !n.hasSplit() {
 		n.elements = append(n.elements, d)
 		n.splitIfNecessary()
@@ -66,7 +79,7 @@ func (n *Node) insert(d PositionedDinosaur) {
 	n.insertAppropriateChild(d)
 }
 
-func (n *Node) insertAppropriateChild(d PositionedDinosaur) {
+func (n *Node) insertAppropriateChild(d dinosaur.PositionedDinosaur) {
 	leftMid := (n.right-n.left)/2 + n.left
 	topMid := (n.top-n.bottom)/2 + n.bottom
 	left := d.Longitude < leftMid
@@ -101,39 +114,50 @@ func (n *Node) split() {
 	n.elements = nil
 }
 
-func (q Quadtree) Get(top float64, left float64, bottom float64, right float64) []PositionedDinosaur {
-	return q.root.get(top, left, bottom, right)
+func (q *Quadtree) Get(top float64, left float64, bottom float64, right float64) []dinosaur.PositionedDinosaur {
+	dinos, expired := q.root.get(top, left, bottom, right)
+	for _, dino := range expired {
+		delete(q.dinos, dino.ID)
+	}
+	return dinos
 }
 
-func (n *Node) get(top float64, left float64, bottom float64, right float64) []PositionedDinosaur {
+// get returns the dinosaurs in the given rect, and the dinosaurs which have expired and should be removed from the Quadtree's map of IDs.
+func (n *Node) get(top float64, left float64, bottom float64, right float64) ([]dinosaur.PositionedDinosaur, []dinosaur.PositionedDinosaur) {
 	if top < n.bottom || bottom > n.top || left > n.right || right < n.left {
-		return nil
+		return nil, nil
 	}
 
 	if !n.hasSplit() {
-		n.removeExpired()
-		return elementsInRect(top, left, bottom, right, n.elements)
+		expired := n.removeExpired()
+		return elementsInRect(top, left, bottom, right, n.elements), expired
 	}
 
-	topLeftElements := n.topLeft.get(top, left, bottom, right)
-	topRightElements := n.topRight.get(top, left, bottom, right)
-	bottomLeftElements := n.bottomLeft.get(top, left, bottom, right)
-	bottomRightElements := n.bottomRight.get(top, left, bottom, right)
+	topLeftElements, topLeftExpired := n.topLeft.get(top, left, bottom, right)
+	topRightElements, topRightExpired := n.topRight.get(top, left, bottom, right)
+	bottomLeftElements, bottomLeftExpired := n.bottomLeft.get(top, left, bottom, right)
+	bottomRightElements, bottomRightExpired := n.bottomRight.get(top, left, bottom, right)
 
-	all := make([]PositionedDinosaur, 0, len(topLeftElements)+len(topRightElements)+len(bottomLeftElements)+len(bottomRightElements))
+	allExpired := make([]dinosaur.PositionedDinosaur, 0, len(topLeftExpired)+len(topRightExpired)+len(bottomLeftExpired)+len(bottomRightExpired))
+	allExpired = append(allExpired, topLeftExpired...)
+	allExpired = append(allExpired, topRightExpired...)
+	allExpired = append(allExpired, bottomLeftExpired...)
+	allExpired = append(allExpired, bottomRightExpired...)
+
+	all := make([]dinosaur.PositionedDinosaur, 0, len(topLeftElements)+len(topRightElements)+len(bottomLeftElements)+len(bottomRightElements))
 	all = append(all, topLeftElements...)
 	all = append(all, topRightElements...)
 	all = append(all, bottomLeftElements...)
 	all = append(all, bottomRightElements...)
-	return all
+	return all, allExpired
 }
 
 func inRect(rtop float64, rleft float64, rbottom float64, rright float64, latitude float64, longitude float64) bool {
 	return latitude < rtop && latitude > rbottom && longitude > rleft && longitude < rright
 }
 
-func elementsInRect(rtop float64, rleft float64, rbottom float64, rright float64, elements []PositionedDinosaur) []PositionedDinosaur {
-	in := []PositionedDinosaur{}
+func elementsInRect(rtop float64, rleft float64, rbottom float64, rright float64, elements []dinosaur.PositionedDinosaur) []dinosaur.PositionedDinosaur {
+	in := []dinosaur.PositionedDinosaur{}
 	for _, e := range elements {
 		if inRect(rtop, rleft, rbottom, rright, e.Latitude, e.Longitude) {
 			in = append(in, e)
@@ -144,13 +168,18 @@ func elementsInRect(rtop float64, rleft float64, rbottom float64, rright float64
 
 // removeExpired removes expired elements.
 // Note this only removes expired elements from this node, not children.
-func (n *Node) removeExpired() {
+// Returns expired dinosaurs, so they may be removed from the Quadtree map of IDs.
+func (n *Node) removeExpired() []dinosaur.PositionedDinosaur {
 	now := time.Now()
-	newElements := []PositionedDinosaur{}
+	newElements := []dinosaur.PositionedDinosaur{}
+	expired := []dinosaur.PositionedDinosaur{}
 	for _, e := range n.elements {
 		if !e.Expiration.Before(now) {
 			newElements = append(newElements, e)
+		} else {
+			expired = append(expired, e)
 		}
 	}
 	n.elements = newElements
+	return expired
 }

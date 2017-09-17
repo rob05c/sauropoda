@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	login "github.com/rob05c/sauropoda/login"
+	"github.com/rob05c/sauropoda/login"
 )
 
 func handleLogin(d RouteData, w http.ResponseWriter, r *http.Request) {

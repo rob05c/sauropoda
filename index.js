@@ -51,7 +51,7 @@ function durationShortStr(duration) {
 function getDinoPopupStr(dino) {
 	var dinoExpireTime = Date.parse(dino.Expiration);
 	var dinoExpireFromNowMs = dinoExpireTime - Date.now() - serverTimeDiff;
-	return "<b>" + dino.ID + " " + dino.Dinosaur.Name + "</b>" + "<br \>" +
+	return "<b>" + dino.ID + " " + dino.Name + "</b>" + "<br \>" +
 		"Time left: " + durationShortStr(dinoExpireFromNowMs);
 }
 
@@ -63,10 +63,10 @@ function addDinosaurToMap(dino, map) {
 	}
   console.log('addDinosaurToMap NEW ' + dino.ID);
 
-	console.log("adding " + dino.ID + " specie" + dino.Dinosaur.Name + " expiration " + dino.Expiration);
+	console.log("adding " + dino.ID + " specie" + dino.Name + " expiration " + dino.Expiration);
 
 	mapDinos[dino.ID] = dino; // TODO change to store a bool or something, if dino isn't needed
-	var name = dino.Dinosaur.Name;
+	var name = dino.Name;
 	// \todo add image path to specie endpoint?
 	var imagePath = "/images/" + name.toLowerCase() + ".png";
 
@@ -92,7 +92,7 @@ function addDinosaurToMap(dino, map) {
   console.log('addDinosaurToMap serverTimeDiff ' + serverTimeDiff);
 	if(dinoExpireFromNowMs > 0) {
 		var marker = L.marker([dino.Latitude, dino.Longitude], {icon: dinoIcon});
-		var popupStr = "<b>" + dino.ID + " " + dino.Dinosaur.Name + "</b>" + "<br \>" +
+		var popupStr = "<b>" + dino.ID + " " + dino.Name + "</b>" + "<br \>" +
 		    "Time left: " + durationShortStr(dinoExpireFromNowMs);
 		marker.bindPopup(popupStr).openPopup();
 		marker.getPopup().Dinosaur = dino;

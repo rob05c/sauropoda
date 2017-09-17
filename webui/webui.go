@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	sdb "github.com/rob05c/sauropoda/db"
+	"github.com/rob05c/sauropoda/dinosaur"
 )
 
 // resourceHandler loads the given file and returns a http Handler, setting CORS to * and the MIME type to mimeType. If mimeType is the empty string, it infers the mime type (when this function is called and the file is loaded, NOT every time the returned HandlerFunc is called).
@@ -39,7 +39,7 @@ const indexCSSPath = "index.css"
 
 // RegisterHandlers registers the HTTP endpoints for the web UI, with the given mux.
 // The pathPrefix is a path to prefix all served paths with. For example, to serve the UI at `/ui/` pass the pathPrefix `ui`.
-func RegisterHandlers(mux *http.ServeMux, pathPrefix string, species map[string]sdb.Species) error {
+func RegisterHandlers(mux *http.ServeMux, pathPrefix string, species map[string]dinosaur.Species) error {
 	for name, _ := range species {
 		lname := strings.ToLower(name)
 		filename := lname + "." + imageExt

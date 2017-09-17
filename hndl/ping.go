@@ -2,7 +2,7 @@ package hndl
 
 import (
 	"fmt"
-	login "github.com/rob05c/sauropoda/login"
+	"github.com/rob05c/sauropoda/login"
 	"net/http"
 )
 
