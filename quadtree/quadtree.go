@@ -66,7 +66,7 @@ func createGeneric(l, r, t, b float64) Quadtree {
 // Insert inserts the given dinosaur into the quadtree
 func (q *Quadtree) Insert(d dino.PositionedDinosaur) {
 	q.root.insert(d)
-	q.dinos[d.ID] = &d
+	q.dinos[d.PositionedID] = &d
 }
 
 func (n *Node) insert(d dino.PositionedDinosaur) {
@@ -117,7 +117,7 @@ func (n *Node) split() {
 func (q *Quadtree) Get(top float64, left float64, bottom float64, right float64) []dino.PositionedDinosaur {
 	dinos, expired := q.root.get(top, left, bottom, right)
 	for _, dino := range expired {
-		delete(q.dinos, dino.ID)
+		delete(q.dinos, dino.PositionedID)
 	}
 	return dinos
 }

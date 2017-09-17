@@ -19,6 +19,7 @@ func handlers(rd RouteData) map[string]http.HandlerFunc {
 		"/createuser": wrapHandler(rd, handleCreateUser),
 		"/ping":       wrapHandler(rd, handlePing),
 		"/catch":      wrapHandler(rd, hndlCatch),
+		"/dinos":      wrapHandler(rd, hndlDinos),
 	}
 }
 

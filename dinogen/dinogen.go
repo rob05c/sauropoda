@@ -60,10 +60,10 @@ func specieToPositioned(specie dino.Species, top, left, bottom, right float64) d
 			Power:  int64(rand.Intn(100)), // TODO implement
 			Health: 100,                   // TODO implement
 		},
-		Latitude:   rand.Float64()*(top-bottom) + bottom,
-		Longitude:  rand.Float64()*(right-left) + left,
-		Expiration: time.Now().Add(time.Second * time.Duration(rand.Intn(int(specie.Popularity*3)+60))), // TODO formalise popularity/expiration ratio
-		ID:         nextDinosaurID(),
+		Latitude:     rand.Float64()*(top-bottom) + bottom,
+		Longitude:    rand.Float64()*(right-left) + left,
+		Expiration:   time.Now().Add(time.Second * time.Duration(rand.Intn(int(specie.Popularity*3)+60))), // TODO formalise popularity/expiration ratio
+		PositionedID: nextDinosaurID(),
 	}
 }
 

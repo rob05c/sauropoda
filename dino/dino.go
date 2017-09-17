@@ -22,10 +22,10 @@ type Dinosaur struct {
 // TODO add json lowercase tags
 type PositionedDinosaur struct {
 	Dinosaur
-	Latitude   float64
-	Longitude  float64
-	Expiration time.Time // TODO rename, as this is used for "caught" time too
-	ID         int64
+	Latitude     float64
+	Longitude    float64
+	Expiration   time.Time // TODO rename, as this is used for "caught" time too
+	PositionedID int64
 }
 
 type OwnedDinosaur struct {

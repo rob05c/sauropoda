@@ -70,7 +70,7 @@ func hndlCatch(d RouteData, w http.ResponseWriter, r *http.Request) {
 }
 
 func insertOwnedDino(db *sql.DB, player string, d dino.OwnedDinosaur) error {
-	if _, err := db.Exec("insert into dinosaur (id, player, positioned_id, latitude, longitude, catch_time, name, power, health) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", d.ID, player, d.PositionedDinosaur.ID, d.Latitude, d.Longitude, d.Expiration, d.Name, d.Power, d.Health); err != nil {
+	if _, err := db.Exec("insert into dinosaur (id, player, positioned_id, latitude, longitude, catch_time, name, power, health) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", d.ID, player, d.PositionedID, d.Latitude, d.Longitude, d.Expiration.UnixNano(), d.Name, d.Power, d.Health); err != nil {
 		// TODO return constant for already owned dino
 		return errors.New("error inserting dinosaur: " + err.Error())
 	}
