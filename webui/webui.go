@@ -33,9 +33,30 @@ func resourceHandler(filename string, mimeType string) (http.HandlerFunc, error)
 const imageDir = "images"
 const imageExt = "png"
 const imageUiPath = "images"
-const indexPath = "index.html"
-const indexJSPath = "index.js"
-const indexCSSPath = "index.css"
+
+const MimeHTML = "text/html"
+const MimeJS = "application/javascript"
+const MimeCSS = "text/css"
+
+type SrvFile struct {
+	File string
+	Path string
+	Mime string
+}
+
+// serveFiles returns a map of files to serve, to their content types
+func serveFiles() []SrvFile {
+	return []SrvFile{
+		SrvFile{Path: "", File: "index.html", Mime: MimeHTML},
+		SrvFile{Path: "index.html", File: "index.html", Mime: MimeHTML},
+		SrvFile{Path: "index.js", File: "index.js", Mime: MimeJS},
+		SrvFile{Path: "index.css", File: "index.css", Mime: MimeCSS},
+		SrvFile{Path: "login", File: "login.html", Mime: MimeHTML},
+		SrvFile{Path: "login.html", File: "login.html", Mime: MimeHTML},
+		SrvFile{Path: "login.js", File: "login.js", Mime: MimeJS},
+		SrvFile{Path: "login.css", File: "login.css", Mime: MimeCSS},
+	}
+}
 
 // RegisterHandlers registers the HTTP endpoints for the web UI, with the given mux.
 // The pathPrefix is a path to prefix all served paths with. For example, to serve the UI at `/ui/` pass the pathPrefix `ui`.
@@ -51,28 +72,16 @@ func RegisterHandlers(mux *http.ServeMux, pathPrefix string, species map[string]
 		mux.HandleFunc(pathPrefix+"/images/"+lname+"png", handler)
 		mux.HandleFunc(pathPrefix+"/images/"+lname+".png", handler)
 	}
-
-	indexHandler, err := resourceHandler(indexPath, "")
-	if err != nil {
-		return fmt.Errorf("%s failed to load: %v", indexPath, err)
-	}
-
-	indexJSHandler, err := resourceHandler(indexJSPath, "application/javascript")
-	if err != nil {
-		return fmt.Errorf("%s failed to load: %v", indexJSPath, err)
-	}
-
-	indexCSSHandler, err := resourceHandler(indexCSSPath, "text/css")
-	if err != nil {
-		return fmt.Errorf("%s failed to load: %v", indexCSSPath, err)
-	}
-
 	if pathPrefix == "" {
 		pathPrefix = "/"
 	}
-	mux.HandleFunc(pathPrefix, indexHandler)
-	mux.HandleFunc(pathPrefix+indexJSPath, indexJSHandler)
-	mux.HandleFunc(pathPrefix+indexCSSPath, indexCSSHandler)
+	for _, srv := range serveFiles() {
+		h, err := resourceHandler(srv.File, srv.Mime)
+		if err != nil {
+			return fmt.Errorf("%s failed to load: %v", srv.File, err)
+		}
+		mux.HandleFunc(pathPrefix+srv.Path, h)
+	}
 
 	return nil
 }
