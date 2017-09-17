@@ -11,15 +11,17 @@ import (
 	"github.com/rob05c/sauropoda/webui"
 )
 
+const apiPrefix = "/api/"
+
 func handlers(rd RouteData) map[string]http.HandlerFunc {
 	return map[string]http.HandlerFunc{
-		"/query/":     wrapHandler(rd, handleQuery),
-		"/now":        handleNow,
-		"/login":      wrapHandler(rd, handleLogin),
-		"/createuser": wrapHandler(rd, handleCreateUser),
-		"/ping":       wrapHandler(rd, handlePing),
-		"/catch":      wrapHandler(rd, hndlCatch),
-		"/dinos":      wrapHandler(rd, hndlDinos),
+		apiPrefix + "query/":     wrapHandler(rd, handleQuery),
+		apiPrefix + "now":        handleNow,
+		apiPrefix + "login":      wrapHandler(rd, handleLogin),
+		apiPrefix + "createuser": wrapHandler(rd, handleCreateUser),
+		apiPrefix + "ping":       wrapHandler(rd, handlePing),
+		apiPrefix + "catch":      wrapHandler(rd, hndlCatch),
+		apiPrefix + "dinos":      wrapHandler(rd, hndlDinos),
 	}
 }
 

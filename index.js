@@ -4,6 +4,15 @@ var map;
 var serverTimeDiff = 0;
 var popupInterval;
 var dinosaurGetIntervalMs = 3000;
+var legendDiv = L.DomUtil.create('div', 'info legend');
+
+function addLegend(map) {
+	var legend = L.control({position: 'bottomright'});
+	legend.onAdd = function (map) {
+		return legendDiv;
+	};
+	legend.addTo(map);
+}
 
 function ajax(path, f) {
 	var xhttp = new XMLHttpRequest();
@@ -18,7 +27,7 @@ function ajax(path, f) {
 
 // queryLatlon does an API query on the given latlon, and calls f with the data
 function queryLatLon(lat, lon, f) {
-	ajax("/query/" + lat + "/" + lon, function(data) {
+	ajax("/api/query/" + lat + "/" + lon, function(data) {
 		f(JSON.parse(data));
 	})
 }
@@ -86,10 +95,10 @@ function addDinosaurToMap(dino, map) {
 	var dinoExpireTime = Date.parse(dino.Expiration);
 	var dinoExpireFromNowMs = dinoExpireTime - Date.now() - serverTimeDiff;
 
-  console.log('addDinosaurToMap dinoExpireFromNowMs ' + dinoExpireFromNowMs);
-  console.log('addDinosaurToMap dinoExpireTime ' + dinoExpireTime);
-  console.log('addDinosaurToMap now.getTime() ' + serverTimeDiff);
-  console.log('addDinosaurToMap serverTimeDiff ' + serverTimeDiff);
+	console.log('addDinosaurToMap dinoExpireFromNowMs ' + dinoExpireFromNowMs);
+	console.log('addDinosaurToMap dinoExpireTime ' + dinoExpireTime);
+	console.log('addDinosaurToMap now.getTime() ' + serverTimeDiff);
+	console.log('addDinosaurToMap serverTimeDiff ' + serverTimeDiff);
 	if(dinoExpireFromNowMs > 0) {
 		var marker = L.marker([dino.Latitude, dino.Longitude], {icon: dinoIcon});
 		var popupStr = "<b>" + dino.PositionedID + " " + dino.Name + "</b>" + "<br \>" +
@@ -117,6 +126,7 @@ function getDinosaursHere() {
 
 function initmap() {
 	map = new L.Map('mapid');
+	addLegend(map);
 
 	// create the tile layer with correct attribution
 	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -128,10 +138,9 @@ function initmap() {
 	var defaultZoom = 15
 
 	map.setView(new L.LatLng(defaultLat, defaultLon), defaultZoom);
-	map.addLayer(osm); 
-  
-	map.locate({setView: true, maxZoom: 18});
+	map.addLayer(osm);
 
+	map.locate({setView: true, maxZoom: 18});
 
   map.on('move', getDinosaursHere);
 	map.on('moveend', function() {
@@ -172,7 +181,7 @@ function setPosition(position) {
 
 function getServerTimeDiff() {
 	var startTime = Date.now();
-	ajax("/now", function(timeStr) {
+	ajax("/api/now", function(timeStr) {
 		var endTime = Date.now();
 		var latency = endTime.getTime() - startTime.getTime();
 		var serverTime = Date.parse(timeStr);

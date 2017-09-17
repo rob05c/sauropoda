@@ -17,20 +17,20 @@ func handleQuery(d RouteData, w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("%v %v X-Real-IP %v X-Forwarded-For %v requested %v\n", time.Now(), r.RemoteAddr, r.Header.Get("X-Real-IP"), r.Header.Get("X-Forwarded-For"), r.URL)
 	urlParts := strings.Split(r.URL.Path, "/")
-	if len(urlParts) < 4 {
+	if len(urlParts) < 5 {
 		fmt.Fprintf(w, "Error: Not enough parts")
 		return
 	}
-	latStr := urlParts[2]
-	lonStr := urlParts[3]
+	latStr := urlParts[3]
+	lonStr := urlParts[4]
 	lat, err := strconv.ParseFloat(latStr, 64)
 	if err != nil {
-		fmt.Fprintf(w, "Error: latitude not a number")
+		fmt.Fprintf(w, "Error: latitude '"+latStr+"' not a number")
 		return
 	}
 	lon, err := strconv.ParseFloat(lonStr, 64)
 	if err != nil {
-		fmt.Fprintf(w, "Error: longitude not a number")
+		fmt.Fprintf(w, "Error: longitude '"+lonStr+"' not a number")
 		return
 	}
 
