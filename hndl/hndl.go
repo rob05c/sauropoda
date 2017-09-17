@@ -15,7 +15,7 @@ const apiPrefix = "/api/"
 
 func handlers(rd RouteData) map[string]http.HandlerFunc {
 	return map[string]http.HandlerFunc{
-		apiPrefix + "query/":     wrapHandler(rd, handleQuery),
+		apiPrefix + "query":      wrapHandler(rd, hndlQuery),
 		apiPrefix + "now":        handleNow,
 		apiPrefix + "login":      wrapHandler(rd, handleLogin),
 		apiPrefix + "createuser": wrapHandler(rd, handleCreateUser),

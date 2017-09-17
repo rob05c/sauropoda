@@ -27,7 +27,7 @@ function ajax(path, f) {
 
 // queryLatlon does an API query on the given latlon, and calls f with the data
 function queryLatLon(lat, lon, f) {
-	ajax("/api/query/" + lat + "/" + lon, function(data) {
+	ajax("/api/query?lat=" + lat + "&lon=" + lon, function(data) {
 		f(JSON.parse(data));
 	})
 }

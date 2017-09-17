@@ -4,43 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/rob05c/sauropoda/dinogen"
 )
 
 // TODO change to return proper error codes
-func handleQuery(d RouteData, w http.ResponseWriter, r *http.Request) {
+func hndlQuery(d RouteData, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-
 	fmt.Printf("%v %v X-Real-IP %v X-Forwarded-For %v requested %v\n", time.Now(), r.RemoteAddr, r.Header.Get("X-Real-IP"), r.Header.Get("X-Forwarded-For"), r.URL)
-	urlParts := strings.Split(r.URL.Path, "/")
-	if len(urlParts) < 5 {
-		fmt.Fprintf(w, "Error: Not enough parts")
-		return
-	}
-	latStr := urlParts[3]
-	lonStr := urlParts[4]
-	lat, err := strconv.ParseFloat(latStr, 64)
-	if err != nil {
-		fmt.Fprintf(w, "Error: latitude '"+latStr+"' not a number")
-		return
-	}
-	lon, err := strconv.ParseFloat(lonStr, 64)
-	if err != nil {
-		fmt.Fprintf(w, "Error: longitude '"+lonStr+"' not a number")
-		return
+
+	handleErr := func(code int, msg string) {
+		w.WriteHeader(code)
+		w.Write([]byte(http.StatusText(code)))
+		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlQuery: " + msg + "\n")
 	}
 
-	if lat > 90.0 || lat < -90.0 {
-		fmt.Fprintf(w, "Error: latitude not between 90 and -90")
-		return
-	}
-
-	if lon > 180.0 || lat < -180.0 {
-		fmt.Fprintf(w, "Error: longitude not between 180 and -180")
+	lat, lon, err := GetLatLon(r)
+	if err != nil {
+		handleErr(http.StatusBadRequest, "getting latlon: "+err.Error())
 		return
 	}
 
