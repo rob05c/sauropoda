@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	sdb "github.com/rob05c/sauropoda/db"
 	"github.com/rob05c/sauropoda/hndl"
 	"github.com/rob05c/sauropoda/quadtree"
+	"github.com/rob05c/sauropoda/sdb"
 )
 
 func main() {

@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	sdb "github.com/rob05c/sauropoda/db"
 	"github.com/rob05c/sauropoda/dinogen"
 	"github.com/rob05c/sauropoda/login"
+	"github.com/rob05c/sauropoda/sdb"
 )
 
 func hndlCatch(d RouteData, w http.ResponseWriter, r *http.Request) {
