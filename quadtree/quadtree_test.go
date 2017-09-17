@@ -1,7 +1,7 @@
 package quadtree
 
 import (
-	"github.com/rob05c/sauropoda/dinosaur"
+	"github.com/rob05c/sauropoda/dino"
 	"math/rand"
 	"testing"
 	"time"
@@ -19,7 +19,7 @@ func randStr(maxLen int) string {
 
 func randDino() PositionedDinosaur {
 	return PositionedDinosaur{
-		Dinosaur: dinosaur.Dinosaur{
+		Dinosaur: dino.Dinosaur{
 			Name:   randStr(100),
 			Power:  int64(rand.Intn(500)),
 			Health: int64(rand.Intn(100)),
@@ -82,7 +82,7 @@ func TestGet(t *testing.T) {
 	}
 
 	d := PositionedDinosaur{
-		Dinosaur: dinosaur.Dinosaur{
+		Dinosaur: dino.Dinosaur{
 			Name:   "George",
 			Power:  42,
 			Health: 97,
@@ -98,7 +98,7 @@ func TestGet(t *testing.T) {
 
 	foundI := -1
 	for i, dino := range dinos {
-		if dino.Dinosaur.Name == "George" {
+		if dino.Dino.Name == "George" {
 			foundI = i
 			break
 		}
@@ -112,7 +112,7 @@ func TestGet(t *testing.T) {
 func TestRemoveExpired(t *testing.T) {
 	qt := Create()
 	d := PositionedDinosaur{
-		Dinosaur: dinosaur.Dinosaur{
+		Dinosaur: dino.Dinosaur{
 			Name:   "George",
 			Power:  42,
 			Health: 97,
@@ -129,7 +129,7 @@ func TestRemoveExpired(t *testing.T) {
 
 	qt = Create()
 	d = PositionedDinosaur{
-		Dinosaur: dinosaur.Dinosaur{
+		Dinosaur: dino.Dinosaur{
 			Name:   "George",
 			Power:  42,
 			Health: 97,

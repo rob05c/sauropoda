@@ -2,7 +2,7 @@ package dinogen
 
 import (
 	"github.com/rob05c/sauropoda/db"
-	"github.com/rob05c/sauropoda/dinosaur"
+	"github.com/rob05c/sauropoda/dino"
 	"github.com/rob05c/sauropoda/quadtree"
 	"math/rand"
 	"testing"
@@ -26,7 +26,7 @@ func randDino(lat, lon float64) quadtree.PositionedDinosaur {
 	lonRadius := MetresToLongitude(radiusMetres, lat)
 
 	return quadtree.PositionedDinosaur{
-		Dinosaur: dinosaur.Dinosaur{
+		Dinosaur: dino.Dinosaur{
 			Name:   randStr(100),
 			Power:  int64(rand.Intn(500)),
 			Health: int64(rand.Intn(100)),

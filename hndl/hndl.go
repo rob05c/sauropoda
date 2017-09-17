@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rob05c/sauropoda/dinosaur"
+	"github.com/rob05c/sauropoda/dino"
 	"github.com/rob05c/sauropoda/quadtree"
 	"github.com/rob05c/sauropoda/webui"
 )
@@ -37,7 +37,7 @@ func RegisterHandlers(rd RouteData) error {
 
 type RouteData struct {
 	DB       *sql.DB
-	Species  map[string]dinosaur.Species
+	Species  map[string]dino.Species
 	QT       quadtree.Quadtree
 	TokenKey []byte
 }

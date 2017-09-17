@@ -1,4 +1,4 @@
-package dinosaur
+package dino
 
 import (
 	"math/rand"
