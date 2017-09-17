@@ -1,14 +1,16 @@
 package hndl
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/rob05c/sauropoda/dino"
 	"github.com/rob05c/sauropoda/dinogen"
 	"github.com/rob05c/sauropoda/login"
-	"github.com/rob05c/sauropoda/sdb"
 )
 
 func hndlCatch(d RouteData, w http.ResponseWriter, r *http.Request) {
@@ -17,60 +19,60 @@ func hndlCatch(d RouteData, w http.ResponseWriter, r *http.Request) {
 	// TODO put in "refreshCookie" helper, for all handlers
 	// TODO log errors
 
+	handleErr := func(code int, msg string) {
+		w.WriteHeader(code)
+		w.Write([]byte(http.StatusText(code)))
+		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: " + msg + "\n")
+	}
+
 	cookie, err := r.Cookie(login.CookieName)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: getting cookie: " + err.Error() + "\n")
+		handleErr(http.StatusUnauthorized, "getting cookie: "+err.Error())
 		return
 	}
 
 	user, err := login.TokenValid(cookie.Value, d.DB, d.TokenKey)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(http.StatusText(http.StatusUnauthorized)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: token invalid: " + err.Error() + "\n")
+		handleErr(http.StatusUnauthorized, "token invalid: "+err.Error())
 		return
 	}
 
 	idStrs, ok := r.URL.Query()["id"]
 	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(http.StatusText(http.StatusBadRequest)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: no ID\n")
+		handleErr(http.StatusBadRequest, "no ID")
 		return
 	}
 	if len(idStrs) != 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(http.StatusText(http.StatusBadRequest)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: multiple IDs\n")
+		handleErr(http.StatusBadRequest, "multiple IDs")
 		return
 	}
 	idStr := idStrs[0]
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(http.StatusText(http.StatusBadRequest)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: ID not an int: " + err.Error() + "\n")
+		handleErr(http.StatusBadRequest, "ID not an int: "+err.Error())
 		return
 	}
 
 	dino, ok := d.QT.GetByID(id)
 	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(http.StatusText(http.StatusNotFound)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: ID has no dino\n")
+		handleErr(http.StatusNotFound, "ID has no dino")
 		return
 	}
 
 	ownedDino := dinogen.PositionedToOwned(*dino)
-	if err := sdb.InsertOwnedDino(d.DB, user, ownedDino); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(http.StatusText(http.StatusBadRequest)))
-		fmt.Print(time.Now().Format(time.RFC3339) + " Error: " + r.RequestURI + " hndlCatch: failed to insert dino: " + err.Error() + "\n")
+	if err := insertOwnedDino(d.DB, user, ownedDino); err != nil {
+		handleErr(http.StatusBadRequest, "failed to insert dino: "+err.Error())
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func insertOwnedDino(db *sql.DB, player string, d dino.OwnedDinosaur) error {
+	if _, err := db.Exec("insert into dinosaur (id, player, positioned_id, latitude, longitude, catch_time, name, power, health) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", d.ID, player, d.PositionedDinosaur.ID, d.Latitude, d.Longitude, d.Expiration, d.Name, d.Power, d.Health); err != nil {
+		// TODO return constant for already owned dino
+		return errors.New("error inserting dinosaur: " + err.Error())
+	}
+	return nil
 }

@@ -2,7 +2,6 @@ package sdb
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/rob05c/sauropoda/dino"
@@ -45,12 +44,4 @@ func LoadConfig(db *sql.DB) (*DBConfig, error) {
 		return nil, fmt.Errorf("querying: %v", err)
 	}
 	return cfg, nil
-}
-
-func InsertOwnedDino(db *sql.DB, player string, d dino.OwnedDinosaur) error {
-	if _, err := db.Exec("insert into dinosaur (id, player, positioned_id, latitude, longitude, catch_time, name, power, health) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", d.ID, player, d.PositionedDinosaur.ID, d.Latitude, d.Longitude, d.Expiration, d.Name, d.Power, d.Health); err != nil {
-		// TODO return constant for already owned dino
-		return errors.New("error inserting dinosaur: " + err.Error())
-	}
-	return nil
 }

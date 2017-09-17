@@ -71,7 +71,7 @@ func TokenValid(tokenStr string, db *sql.DB, key []byte) (string, error) {
 	return claims.Subject, nil
 }
 
-// dbValid returns whether the given user exists in the database, and their password hasn't change since the given time.
+// dbValid returns whether the given user exists in the database, and their password hasn't changed since the given time.
 func dbValid(db *sql.DB, name string, notModifiedAfter int64) error {
 	q := "select updated from user where name = $1;"
 	updated := int64(0)
