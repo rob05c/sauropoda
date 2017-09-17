@@ -8,7 +8,8 @@ function login() {
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4) {
       if (this.status == 200) {
-        document.getElementById("loginFail").textContent = "Success! TODO: redirect";
+        window.location.href = '/';
+        document.getElementById("loginFail").textContent = "Success! Redirecting...";
       } else {
         document.getElementById("loginFail").textContent = "Bad username or password";
       }
