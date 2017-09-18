@@ -6,14 +6,6 @@ var popupInterval;
 var dinosaurGetIntervalMs = 3000;
 var legendDiv = L.DomUtil.create('div', 'info legend');
 
-function addLegend(map) {
-	var legend = L.control({position: 'bottomright'});
-	legend.onAdd = function (map) {
-		return legendDiv;
-	};
-	legend.addTo(map);
-}
-
 function ajax(path, f) {
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() {
@@ -25,15 +17,65 @@ function ajax(path, f) {
 	xhttp.send();
 }
 
+function addLegend(map) {
+	var legend = L.control({position: 'bottomright'});
+	legend.onAdd = function (map) {
+		return legendDiv;
+	};
+	legend.addTo(map);
+  getPlayerDinos();
+}
+
+function addLabelVal(parent, label, val) {
+  var lblName = document.createElement("span");
+  var lblNameTxt = document.createTextNode(label + ": ");
+  lblName.appendChild(lblNameTxt);
+
+  var valName = document.createElement("span");
+  var valNameTxt = document.createTextNode(val);
+  valName.appendChild(valNameTxt);
+
+  var brName = document.createElement("br");
+
+  parent.appendChild(lblName);
+  parent.appendChild(valName);
+  parent.appendChild(brName);
+}
+
+function MakeOwnedDinoHTML(dino) {
+  var parent = document.createElement("span");
+  addLabelVal(parent, "Name", dino.Name);
+  addLabelVal(parent, "ID", dino.ID);
+  addLabelVal(parent, "Power", dino.Power);
+  addLabelVal(parent, "Health", dino.Health);
+  addLabelVal(parent, "Found At", '' + dino.Latitude + ',' + dino.Longitude);
+  return parent
+}
+
+// gets the dinos owned by the logged in player, and populates the legendDiv
+function getPlayerDinos() {
+  // TODO handle unauthenticated
+  ajax("/api/dinos", function(data) {
+    var dinos = JSON.parse(data);
+    for (i = 0; i < dinos.length; i++) {
+      var dino = dinos[i];
+      var dinoSpan = MakeOwnedDinoHTML(dino);
+      legendDiv.appendChild(dinoSpan);
+      legendDiv.appendChild(document.createElement("br"));
+    }
+  });
+}
+
+
 // queryLatlon does an API query on the given latlon, and calls f with the data
 function queryLatLon(lat, lon, f) {
 	ajax("/api/query?lat=" + lat + "&lon=" + lon, function(data) {
 		f(JSON.parse(data));
-	})
+	});
 }
 
 function addDinosaursToMap(dinosaurs, map) {
-	console.log('addDinosaursToMap ' + dinosaurs.length);
+	// console.log('addDinosaursToMap ' + dinosaurs.length);
 	var dinosaursLen = dinosaurs.length;
 	for (var i = 0; i < dinosaursLen; i++) {
 		addDinosaurToMap(dinosaurs[i], map);
@@ -65,14 +107,14 @@ function getDinoPopupStr(dino) {
 }
 
 function addDinosaurToMap(dino, map) {
-  console.log('addDinosaurToMap ' + dino.PositionedID);
+  // console.log('addDinosaurToMap ' + dino.PositionedID);
 	if(mapDinos.hasOwnProperty(dino.PositionedID)) {
-    console.log('addDinosaurToMap HAS ' + dino.PositionedID);
+    // console.log('addDinosaurToMap HAS ' + dino.PositionedID);
 		return
 	}
-  console.log('addDinosaurToMap NEW ' + dino.PositionedID);
+  // console.log('addDinosaurToMap NEW ' + dino.PositionedID);
 
-	console.log("adding " + dino.PositionedID + " specie" + dino.Name + " expiration " + dino.Expiration);
+	// console.log("adding " + dino.PositionedID + " specie" + dino.Name + " expiration " + dino.Expiration);
 
 	mapDinos[dino.PositionedID] = dino; // TODO change to store a bool or something, if dino isn't needed
 	var name = dino.Name;
@@ -95,10 +137,10 @@ function addDinosaurToMap(dino, map) {
 	var dinoExpireTime = Date.parse(dino.Expiration);
 	var dinoExpireFromNowMs = dinoExpireTime - Date.now() - serverTimeDiff;
 
-	console.log('addDinosaurToMap dinoExpireFromNowMs ' + dinoExpireFromNowMs);
-	console.log('addDinosaurToMap dinoExpireTime ' + dinoExpireTime);
-	console.log('addDinosaurToMap now.getTime() ' + serverTimeDiff);
-	console.log('addDinosaurToMap serverTimeDiff ' + serverTimeDiff);
+	// console.log('addDinosaurToMap dinoExpireFromNowMs ' + dinoExpireFromNowMs);
+	// console.log('addDinosaurToMap dinoExpireTime ' + dinoExpireTime);
+	// console.log('addDinosaurToMap now.getTime() ' + serverTimeDiff);
+	// console.log('addDinosaurToMap serverTimeDiff ' + serverTimeDiff);
 	if(dinoExpireFromNowMs > 0) {
 		var marker = L.marker([dino.Latitude, dino.Longitude], {icon: dinoIcon});
 		var popupStr = "<b>" + dino.PositionedID + " " + dino.Name + "</b>" + "<br \>" +
@@ -110,7 +152,7 @@ function addDinosaurToMap(dino, map) {
 		window.setTimeout(function() {
 		  map.removeLayer(marker);
 		  delete mapDinos[dino.PositionedID];
-		  console.log("removing " + dino.PositionedID);
+		  // console.log("removing " + dino.PositionedID);
 		}, dinoExpireFromNowMs);
 	}
 }
@@ -144,7 +186,7 @@ function initmap() {
 
   map.on('move', getDinosaursHere);
 	map.on('moveend', function() {
-		console.log("map moved - calling getDinosaursHere()");
+		// console.log("map moved - calling getDinosaursHere()");
 		getDinosaursHere();
 	});
 	map.on('popupopen', function(popupEvent) {
@@ -152,7 +194,7 @@ function initmap() {
 		var dino = popup.Dinosaur;
 		if(dino) {
 			popup.setContent(getDinoPopupStr(dino));
-			console.log('setting interval ' + dino.PositionedID)
+			// console.log('setting interval ' + dino.PositionedID)
 			popup.UpdateInterval = window.setInterval(function() {
 				popup.setContent(getDinoPopupStr(dino));
 			}, 1000);
@@ -162,7 +204,7 @@ function initmap() {
 		var popup = popupEvent.popup;
 		if(popup.UpdateInterval) {
 			clearInterval(popup.UpdateInterval)
-			console.log('clearing interval ' + popup.Dinosaur.PositionedID)
+			// console.log('clearing interval ' + popup.Dinosaur.PositionedID)
 		}
 	})
   getDinosaursHere();
@@ -175,7 +217,7 @@ function setLocation() {
 	}
 }
 function setPosition(position) {
-	console.log('' + position.coords.latitude + ' ' + position.coords.longitude);
+	// console.log('' + position.coords.latitude + ' ' + position.coords.longitude);
 	map.setView(new L.LatLng(position.coords.latitude, position.coords.longitude), 18);
 }
 
@@ -187,7 +229,7 @@ function getServerTimeDiff() {
 		var serverTime = Date.parse(timeStr);
 		// we subtract (latency / 2), because that's presumably how long it took to get back to us after the server created the timestamp
 		serverTimeDiff = Date.now() - serverTime -  (latency / 2);
-	})
+	});
 }
 
 function init() {
