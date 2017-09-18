@@ -13,7 +13,7 @@ import (
 )
 
 func hndlDinos(d RouteData, w http.ResponseWriter, r *http.Request) {
-	fmt.Print(time.Now().Format(time.RFC3339) + " INFO: " + r.RequestURI + " hndlCatch\n")
+	fmt.Print(time.Now().Format(time.RFC3339) + " INFO: " + r.RequestURI + " hndlDinos\n")
 	defer r.Body.Close()
 	// TODO put in "refreshCookie" helper, for all handlers
 	// TODO log errors
