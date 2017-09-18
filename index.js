@@ -17,6 +17,17 @@ function ajax(path, f) {
 	xhttp.send();
 }
 
+function ajaxCode(path, f) {
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+		if (this.readyState == 4) {
+		  f(this.responseText, this.status)
+		}
+	};
+	xhttp.open("GET", path, true);
+	xhttp.send();
+}
+
 function addLegend(map) {
 	var legend = L.control({position: 'bottomright'});
 	legend.onAdd = function (map) {
@@ -56,6 +67,10 @@ function MakeOwnedDinoHTML(dino) {
 function getPlayerDinos() {
   // TODO handle unauthenticated
   ajax("/api/dinos", function(data) {
+    while (legendDiv.firstChild) {
+      legendDiv.removeChild(legendDiv.firstChild);
+    }
+
     var dinos = JSON.parse(data);
     for (i = 0; i < dinos.length; i++) {
       var dino = dinos[i];
@@ -100,10 +115,22 @@ function durationShortStr(duration) {
 }
 
 function getDinoPopupStr(dino) {
-	var dinoExpireTime = Date.parse(dino.Expiration);
-	var dinoExpireFromNowMs = dinoExpireTime - Date.now() - serverTimeDiff;
-	return "<b>" + dino.PositionedID + " " + dino.Name + "</b>" + "<br \>" +
-		"Time left: " + durationShortStr(dinoExpireFromNowMs);
+  var dinoExpireTime = Date.parse(dino.Expiration);
+  var dinoExpireFromNowMs = dinoExpireTime - Date.now() - serverTimeDiff;
+  return "<b>" + dino.PositionedID + " " + dino.Name + "</b>" + "<br \>" +
+    "Time left: " + durationShortStr(dinoExpireFromNowMs) + "<br \>" +
+    '<input id="catchBtn'+dino.PositionedID+'" type="button" value="Catch!" onclick="catchDino(' + dino.PositionedID + ', \'' + dino.Name + '\');" />';
+}
+
+function catchDino(id, name) {
+  ajaxCode('/api/catch?id='+id, function(resp, code) {
+    if(code == 200) {
+      alert('You Caught ' + name + '!');
+      getPlayerDinos();
+    } else {
+      alert('It got away!');
+    }
+  });
 }
 
 function addDinosaurToMap(dino, map) {
