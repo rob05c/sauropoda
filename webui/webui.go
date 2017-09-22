@@ -55,6 +55,10 @@ func serveFiles() []SrvFile {
 		SrvFile{Path: "login.html", File: "login.html", Mime: MimeHTML},
 		SrvFile{Path: "login.js", File: "login.js", Mime: MimeJS},
 		SrvFile{Path: "login.css", File: "login.css", Mime: MimeCSS},
+		SrvFile{Path: "player", File: "player.html", Mime: MimeHTML},
+		SrvFile{Path: "player.html", File: "player.html", Mime: MimeHTML},
+		SrvFile{Path: "player.js", File: "player.js", Mime: MimeJS},
+		SrvFile{Path: "player.css", File: "player.css", Mime: MimeCSS},
 	}
 }
 

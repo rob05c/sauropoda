@@ -15,13 +15,14 @@ const apiPrefix = "/api/"
 
 func handlers(rd RouteData) map[string]http.HandlerFunc {
 	return map[string]http.HandlerFunc{
-		apiPrefix + "query":      wrapHandler(rd, hndlQuery),
+		apiPrefix + "query":      withrd(rd, hndlQuery),
 		apiPrefix + "now":        handleNow,
-		apiPrefix + "login":      wrapHandler(rd, handleLogin),
-		apiPrefix + "createuser": wrapHandler(rd, handleCreateUser),
-		apiPrefix + "ping":       wrapHandler(rd, handlePing),
-		apiPrefix + "catch":      wrapHandler(rd, hndlCatch),
-		apiPrefix + "dinos":      wrapHandler(rd, hndlDinos),
+		apiPrefix + "login":      withrd(rd, handleLogin),
+		apiPrefix + "createuser": withrd(rd, handleCreateUser),
+		apiPrefix + "ping":       withrd(rd, handlePing),
+		apiPrefix + "catch":      withrd(rd, hndlCatch),
+		apiPrefix + "dinos":      withrd(rd, hndlDinos),
+		apiPrefix + "player":     withrd(rd, hndlPlayer),
 	}
 }
 
@@ -47,7 +48,7 @@ type RouteData struct {
 
 type DataHandlerFunc func(rd RouteData, w http.ResponseWriter, r *http.Request)
 
-func wrapHandler(d RouteData, f DataHandlerFunc) http.HandlerFunc {
+func withrd(d RouteData, f DataHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		f(d, w, r)
 	}

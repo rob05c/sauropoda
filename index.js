@@ -4,6 +4,7 @@ var map;
 var serverTimeDiff = 0;
 var popupInterval;
 var dinosaurGetIntervalMs = 3000;
+var legendDivParent = L.DomUtil.create('div', 'legendParent');
 var legendDiv = L.DomUtil.create('div', 'info legend');
 
 function ajax(path, f) {
@@ -30,8 +31,9 @@ function ajaxCode(path, f) {
 
 function addLegend(map) {
 	var legend = L.control({position: 'bottomright'});
+	legendDivParent.appendChild(legendDiv);
 	legend.onAdd = function (map) {
-		return legendDiv;
+		return legendDivParent;
 	};
 	legend.addTo(map);
   getPlayerDinos();
