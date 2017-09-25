@@ -31,7 +31,7 @@ function addLabelVal(parent, label, val) {
 
 function makeDinoImg(dino) {
   var i = document.createElement("img");
-  i.setAttribute("src", '/images/' + dino.Name.toLowerCase() + '.png');
+  i.setAttribute("src", '/img/' + dino.Name.toLowerCase() + '.png');
   i.setAttribute("alt", dino.Name.toLowerCase());
   return i
 }

@@ -30,9 +30,10 @@ func resourceHandler(filename string, mimeType string) (http.HandlerFunc, error)
 // image/png
 // text/html
 
-const imageDir = "images"
+const staticDir = "static"
+const imageDir = "img"
 const imageExt = "png"
-const imageUiPath = "images"
+const imageUIPath = "img"
 
 const MimeHTML = "text/html"
 const MimeJS = "application/javascript"
@@ -47,22 +48,22 @@ type SrvFile struct {
 // serveFiles returns a map of files to serve, to their content types
 func serveFiles() []SrvFile {
 	return []SrvFile{
-		SrvFile{Path: "", File: "index.html", Mime: MimeHTML},
-		SrvFile{Path: "index.html", File: "index.html", Mime: MimeHTML},
-		SrvFile{Path: "index.js", File: "index.js", Mime: MimeJS},
-		SrvFile{Path: "index.css", File: "index.css", Mime: MimeCSS},
-		SrvFile{Path: "login", File: "login.html", Mime: MimeHTML},
-		SrvFile{Path: "login.html", File: "login.html", Mime: MimeHTML},
-		SrvFile{Path: "login.js", File: "login.js", Mime: MimeJS},
-		SrvFile{Path: "login.css", File: "login.css", Mime: MimeCSS},
-		SrvFile{Path: "player", File: "player.html", Mime: MimeHTML},
-		SrvFile{Path: "player.html", File: "player.html", Mime: MimeHTML},
-		SrvFile{Path: "player.js", File: "player.js", Mime: MimeJS},
-		SrvFile{Path: "player.css", File: "player.css", Mime: MimeCSS},
-		SrvFile{Path: "dinos", File: "dinos.html", Mime: MimeHTML},
-		SrvFile{Path: "dinos.html", File: "dinos.html", Mime: MimeHTML},
-		SrvFile{Path: "dinos.js", File: "dinos.js", Mime: MimeJS},
-		SrvFile{Path: "dinos.css", File: "dinos.css", Mime: MimeCSS},
+		SrvFile{Path: "", File: staticDir + "/" + "index.html", Mime: MimeHTML},
+		SrvFile{Path: "index.html", File: staticDir + "/" + "index.html", Mime: MimeHTML},
+		SrvFile{Path: "index.js", File: staticDir + "/" + "index.js", Mime: MimeJS},
+		SrvFile{Path: "index.css", File: staticDir + "/" + "index.css", Mime: MimeCSS},
+		SrvFile{Path: "login", File: staticDir + "/" + "login.html", Mime: MimeHTML},
+		SrvFile{Path: "login.html", File: staticDir + "/" + "login.html", Mime: MimeHTML},
+		SrvFile{Path: "login.js", File: staticDir + "/" + "login.js", Mime: MimeJS},
+		SrvFile{Path: "login.css", File: staticDir + "/" + "login.css", Mime: MimeCSS},
+		SrvFile{Path: "player", File: staticDir + "/" + "player.html", Mime: MimeHTML},
+		SrvFile{Path: "player.html", File: staticDir + "/" + "player.html", Mime: MimeHTML},
+		SrvFile{Path: "player.js", File: staticDir + "/" + "player.js", Mime: MimeJS},
+		SrvFile{Path: "player.css", File: staticDir + "/" + "player.css", Mime: MimeCSS},
+		SrvFile{Path: "dinos", File: staticDir + "/" + "dinos.html", Mime: MimeHTML},
+		SrvFile{Path: "dinos.html", File: staticDir + "/" + "dinos.html", Mime: MimeHTML},
+		SrvFile{Path: "dinos.js", File: staticDir + "/" + "dinos.js", Mime: MimeJS},
+		SrvFile{Path: "dinos.css", File: staticDir + "/" + "dinos.css", Mime: MimeCSS},
 	}
 }
 
@@ -72,13 +73,12 @@ func RegisterHandlers(mux *http.ServeMux, pathPrefix string, species map[string]
 	for name, _ := range species {
 		lname := strings.ToLower(name)
 		filename := lname + "." + imageExt
-		imgPath := imageDir + "/species/" + filename
+		imgPath := staticDir + "/" + imageDir + "/species/" + filename
 		handler, err := resourceHandler(imgPath, "")
 		if err != nil {
 			return fmt.Errorf("%s image '%s' failed to load: %v", name, imgPath, err)
 		}
-		mux.HandleFunc(pathPrefix+"/images/"+lname+"png", handler)
-		mux.HandleFunc(pathPrefix+"/images/"+lname+".png", handler)
+		mux.HandleFunc(pathPrefix+"/"+imageUIPath+"/"+lname+".png", handler)
 	}
 	if pathPrefix == "" {
 		pathPrefix = "/"

@@ -148,7 +148,7 @@ function addDinosaurToMap(dino, map) {
 	mapDinos[dino.PositionedID] = dino; // TODO change to store a bool or something, if dino isn't needed
 	var name = dino.Name;
 	// \todo add image path to specie endpoint?
-	var imagePath = "/images/" + name.toLowerCase() + ".png";
+	var imagePath = "/img/" + name.toLowerCase() + ".png";
 
 	// \todo add image dimensions to specie endpoint?
 	// \todo store specie icons, for speed?
