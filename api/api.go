@@ -49,8 +49,13 @@ type RouteData struct {
 
 type DataHandlerFunc func(rd RouteData, w http.ResponseWriter, r *http.Request)
 
+func commonHdrs(w http.ResponseWriter) {
+	w.Header().Set("Cache-Control", "no-cache")
+}
+
 func withrd(d RouteData, f DataHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		commonHdrs(w)
 		f(d, w, r)
 	}
 }
