@@ -8,7 +8,7 @@ import (
 
 	"github.com/rob05c/sauropoda/dino"
 	"github.com/rob05c/sauropoda/quadtree"
-	"github.com/rob05c/sauropoda/webui"
+	"github.com/rob05c/sauropoda/ui"
 )
 
 const apiPrefix = "/api/"
@@ -30,7 +30,7 @@ func handlers(rd RouteData) map[string]http.HandlerFunc {
 func RegisterHandlers(rd RouteData) error {
 	// TODO create api.RegisterHandlers
 	uiPathPrefix := ""
-	if err := webui.RegisterHandlers(http.DefaultServeMux, uiPathPrefix, rd.Species); err != nil {
+	if err := ui.RegisterHandlers(http.DefaultServeMux, uiPathPrefix, rd.Species); err != nil {
 		return err
 	}
 	handlers := handlers(rd)
