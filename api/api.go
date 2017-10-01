@@ -23,6 +23,7 @@ func handlers(rd RouteData) map[string]http.HandlerFunc {
 		apiPrefix + "catch":      withrd(rd, hndlCatch),
 		apiPrefix + "dinos":      withrd(rd, hndlDinos),
 		apiPrefix + "player":     withrd(rd, hndlPlayer),
+		apiPrefix + "journal":    withrd(rd, hndlJournal),
 	}
 }
 

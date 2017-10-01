@@ -64,6 +64,10 @@ func serveFiles() []SrvFile {
 		SrvFile{Path: "dinos.html", File: staticDir + "/" + "dinos.html", Mime: MimeHTML},
 		SrvFile{Path: "dinos.js", File: staticDir + "/" + "dinos.js", Mime: MimeJS},
 		SrvFile{Path: "dinos.css", File: staticDir + "/" + "dinos.css", Mime: MimeCSS},
+		SrvFile{Path: "journal", File: staticDir + "/" + "journal.html", Mime: MimeHTML},
+		SrvFile{Path: "journal.html", File: staticDir + "/" + "journal.html", Mime: MimeHTML},
+		SrvFile{Path: "journal.js", File: staticDir + "/" + "journal.js", Mime: MimeJS},
+		SrvFile{Path: "journal.css", File: staticDir + "/" + "journal.css", Mime: MimeCSS},
 	}
 }
 

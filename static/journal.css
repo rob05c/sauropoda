@@ -1,0 +1,35 @@
+html{
+  /* min-height:100%; /\* // make sure it is at least as tall as the viewport *\/ */
+  /* position:relative; */
+  min-height:100%;
+  height: 100%; /* // force the BODY element to match the height of the HTML element */
+  padding:0;
+  margin:0;
+}
+
+body{
+  min-height:100%;
+  height: 100%; /* // force the BODY element to match the height of the HTML element */
+  padding:0;
+  margin:0;
+}
+
+.wrapper {
+  padding: 0 0 50px 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.content {
+  height: calc(100% - 10px);
+  overflow:scroll;
+}
+
+.footer {
+  margin-bottom: -10px;
+  height: 8px;
+  text-align:center;
+}
