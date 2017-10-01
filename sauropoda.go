@@ -1,9 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rob05c/sauropoda/api"
@@ -14,7 +16,11 @@ import (
 func main() {
 	rand.Seed(time.Now().Unix())
 
-	db, err := sdb.Create()
+	var port = flag.Int("port", 80, "HTTP port")
+	var dbPath = flag.String("db", "./db.sqlite", "Database file path")
+	flag.Parse()
+
+	db, err := sdb.Create(*dbPath)
 	if err != nil {
 		fmt.Printf("Error creating database: %v\n", err)
 		return
@@ -40,17 +46,17 @@ func main() {
 	}
 
 	//	fmt.Printf("Species: %v\n", species)
-	fmt.Println("Serving :80")
-	Serve(rd)
+	fmt.Println("Serving :" + strconv.Itoa(*port))
+	Serve(*port, rd)
 }
 
-func Serve(rd api.RouteData) {
+func Serve(port int, rd api.RouteData) {
 	if err := api.RegisterHandlers(rd); err != nil {
 		fmt.Printf("Error registering handlers: %v\n", err)
 		return
 	}
 
-	if err := http.ListenAndServe(":80", nil); err != nil {
+	if err := http.ListenAndServe(":"+strconv.Itoa(port), nil); err != nil {
 		fmt.Printf("Error serving: %v\n", err)
 		return
 	}

@@ -9,8 +9,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func Create() (*sql.DB, error) {
-	return sql.Open("sqlite3", "./db.sqlite")
+func Create(path string) (*sql.DB, error) {
+	return sql.Open("sqlite3", path)
 }
 
 func LoadSpecies(db *sql.DB) (map[string]dino.Species, error) {
