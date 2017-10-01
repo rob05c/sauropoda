@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rob05c/sauropoda/hndl"
+	"github.com/rob05c/sauropoda/api"
 	"github.com/rob05c/sauropoda/quadtree"
 	"github.com/rob05c/sauropoda/sdb"
 )
@@ -32,7 +32,7 @@ func main() {
 		return
 	}
 
-	rd := hndl.RouteData{
+	rd := api.RouteData{
 		DB:       db,
 		Species:  species,
 		QT:       quadtree.Create(),
@@ -40,17 +40,17 @@ func main() {
 	}
 
 	//	fmt.Printf("Species: %v\n", species)
-	fmt.Println("Serving :47777")
+	fmt.Println("Serving :80")
 	Serve(rd)
 }
 
-func Serve(rd hndl.RouteData) {
-	if err := hndl.RegisterHandlers(rd); err != nil {
+func Serve(rd api.RouteData) {
+	if err := api.RegisterHandlers(rd); err != nil {
 		fmt.Printf("Error registering handlers: %v\n", err)
 		return
 	}
 
-	if err := http.ListenAndServe(":47777", nil); err != nil {
+	if err := http.ListenAndServe(":80", nil); err != nil {
 		fmt.Printf("Error serving: %v\n", err)
 		return
 	}
